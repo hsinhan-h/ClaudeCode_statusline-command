@@ -28,20 +28,26 @@ for ((i=0; i<EMPTY; i++)); do BAR="${BAR}░"; done
 
 MINS=$((DURATION_MS / 60000)); SECS=$(((DURATION_MS % 60000) / 1000))
 
-# Git branch
+# Git branch, staged/modified counts, and clickable repo link
 BRANCH=""
-git rev-parse --git-dir > /dev/null 2>&1 && BRANCH=" | $(git branch --show-current 2>/dev/null)"
-
-# Clickable repo link (iTerm2/Kitty/WezTerm)
+GIT_STATUS=""
 REPO_LINK="${DIR##*/}"
-REMOTE=$(git remote get-url origin 2>/dev/null | sed 's/git@github.com:/https:\/\/github.com\//' | sed 's/\.git$//')
-if [ -n "$REMOTE" ]; then
-    REPO_NAME=$(basename "$REMOTE")
-    REPO_LINK=$(printf '%b' "\e]8;;${REMOTE}\a${REPO_NAME}\e]8;;\a")
+if git rev-parse --git-dir > /dev/null 2>&1; then
+    BRANCH=" | $(git branch --show-current 2>/dev/null)"
+    STAGED=$(git diff --cached --numstat 2>/dev/null | wc -l | tr -d ' ')
+    MODIFIED=$(git diff --numstat 2>/dev/null | wc -l | tr -d ' ')
+    [ "$STAGED" -gt 0 ] && GIT_STATUS=" ${GREEN}+${STAGED}${RESET}"
+    [ "$MODIFIED" -gt 0 ] && GIT_STATUS="${GIT_STATUS} ${YELLOW}~${MODIFIED}${RESET}"
+
+    REMOTE=$(git remote get-url origin 2>/dev/null | sed 's/git@github.com:/https:\/\/github.com\//' | sed 's/\.git$//')
+    if [ -n "$REMOTE" ]; then
+        REPO_NAME=$(basename "$REMOTE")
+        REPO_LINK=$(printf '%b' "\e]8;;${REMOTE}\a${REPO_NAME}\e]8;;\a")
+    fi
 fi
 
-# Line 1: model, repo link, git branch
-echo -e "${CYAN}[$MODEL]${RESET} ${REPO_LINK}${BRANCH}"
+# Line 1: model, repo link, git branch, git status
+echo -e "${CYAN}[$MODEL]${RESET} ${REPO_LINK}${BRANCH}${GIT_STATUS}"
 # Line 2: context bar, cost, duration
 COST_FMT=$(printf '$%.2f' "$COST")
 echo -e "${BAR_COLOR}${BAR}${RESET} ${PCT}% | ${YELLOW}${COST_FMT}${RESET} | ${MINS}m ${SECS}s"

@@ -18,6 +18,7 @@ A custom status line script for [Claude Code](https://claude.ai/code) that displ
 - Current model name (e.g., `[Sonnet 4.6]`)
 - Clickable repository link (supports OSC 8 hyperlinks in iTerm2 / WezTerm / Kitty)
 - Current git branch
+- Git status: staged file count (green `+N`) and modified file count (yellow `~N`)
 
 **Line 2**
 - Context window usage bar (color changes green → yellow → red as usage increases)
