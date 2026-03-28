@@ -56,11 +56,12 @@ Add the following to `~/.claude/settings.json`:
 
 ```json
 {
-  "statusLine": "C:/Users/<your-username>/.claude/statusline-command.sh"
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline-command.sh"
+  }
 }
 ```
-
-> On macOS/Linux use the path format: `~/.claude/statusline-command.sh`
 
 ## How It Works
 
